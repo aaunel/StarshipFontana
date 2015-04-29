@@ -11,11 +11,15 @@ SFEvent::SFEvent(const SDL_Event & event) {
   case SDL_USEREVENT:
     code = SFEVENT_UPDATE;
     break;
+  // here I was able to extend player up-down movement,
+  // from keyboard events
   case SDL_KEYDOWN:
     switch (event.key.keysym.sym) {
+    // handle 'up' key
     case SDLK_UP:
       code = SFEVENT_PLAYER_UP;
       break;
+    // handle 'down' key
     case SDLK_DOWN:
       code = SFEVENT_PLAYER_DOWN;
       break;

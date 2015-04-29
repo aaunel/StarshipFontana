@@ -15,6 +15,9 @@ SFAsset::SFAsset(SFASSETTYPE type, std::shared_ptr<SFWindow> window): type(type)
   case SFASSET_ALIEN:
     sprite = IMG_LoadTexture(sf_window->getRenderer(), "assets/alien.png");
     break;
+  // here I'm loading in some new assets,
+  // doesn't make for the most interesting code
+  // but snags all the eye-catching glory
   case SFASSET_METEOR:
     sprite = IMG_LoadTexture(sf_window->getRenderer(), "assets/meteor.png");
     break;
@@ -79,6 +82,11 @@ Point2 SFAsset::GetPosition() {
   return Point2(bbox->centre->getX(), bbox->centre->getY());
 }
 
+// acceleration multipliers implemented here
+// allow tweaks to be made to make the game feel more fluid,
+// around this time I was also trying to smoothen out the movement
+// but found I was limited without introducing a concept like deltaTime
+// with velocity, momentum, etc .. may have jeopardized getting this done!
 void SFAsset::SetAcceleration(int num) {
   acc = num;
 }
@@ -106,6 +114,9 @@ void SFAsset::OnRender() {
   SDL_RenderCopy(sf_window->getRenderer(), sprite, NULL, &rect);
 }
 
+// extended for omni-directional movement,
+// this involved extending the existing methods to include complete
+// GoNorth() and GoSouth(), and binding those actions to key events
 void SFAsset::GoNorth() {
   Vector2 c = *(bbox->centre) + Vector2(0.0f, 1.0f * GetAcceleration());
   bbox->centre.reset();
@@ -154,7 +165,5 @@ bool SFAsset::IsAlive() {
 }
 
 void SFAsset::HandleCollision() {
-  if(SFASSET_PROJECTILE == type || SFASSET_ALIEN == type || SFASSET_METEOR == type) {
-    SetNotAlive();
-  }
+  SetNotAlive();
 }

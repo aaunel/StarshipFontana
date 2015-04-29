@@ -8,6 +8,7 @@ using namespace std;  // So that we can write `vector` rather than `std::vector`
 
 // Very Uncool Global Variable
 // Fixme: Bonus points for making this go away.
+// I tried :(
 SDL_Window * g_window;
 SDL_Renderer * g_renderer;
 

@@ -20,12 +20,15 @@ SFApp::SFApp(std::shared_ptr<SFWindow> window) : fire(0), is_running(true), sf_w
     aliens.push_back(alien);
   }
 
+  // the meteor adds an additional sprite
+  // managed using std::list, which could allow for multiple meteors
   auto meteor = make_shared<SFAsset>(SFASSET_METEOR, sf_window);
-  auto meteor_pos = Point2(canvas_w - 100, 300.0f);
+  auto meteor_pos = Point2(canvas_w - 100, 100.0f);
   meteor->SetAcceleration(1);
   meteor->SetPosition(meteor_pos);
   meteors.push_back(meteor);
 
+  // the powerup is similar to a coin, but hey - it's a power up
   auto powerup = make_shared<SFAsset>(SFASSET_POWERUP, sf_window);
   auto pos  = Point2((canvas_w/4), 100);
   powerup->SetAcceleration(1);
@@ -50,9 +53,11 @@ void SFApp::OnEvent(SFEvent& event) {
     OnUpdateWorld();
     OnRender();
     break;
+  // adds player up movement
   case SFEVENT_PLAYER_UP:
     player->GoNorth();
     break;
+  // adds player down movement
   case SFEVENT_PLAYER_DOWN:
     player->GoSouth();
     break;
@@ -89,11 +94,11 @@ void SFApp::OnUpdateWorld() {
   }
 
   for(auto m: meteors) {
-    m->GoSouth();
+    m->GoNorth();
   }
 
-  for(auto c: powerups) {
-    c->GoNorth();
+  for(auto u: powerups) {
+    u->GoNorth();
   }
 
   // Update enemy positions
@@ -101,7 +106,7 @@ void SFApp::OnUpdateWorld() {
     // do something here
   }
 
-  // Detect collisions
+  // Detect projectile collisions
   for(auto p : projectiles) {
     for(auto a : aliens) {
       if(p->CollidesWith(a)) {
@@ -109,10 +114,14 @@ void SFApp::OnUpdateWorld() {
         a->HandleCollision();
       }
     }
-    for(auto m : meteors) {
-      if(p->CollidesWith(m)) {
-        p->HandleCollision();
+  }
+
+  // Detect meteor collisions
+  for(auto m : meteors) {
+    for(auto a : aliens) {
+      if(m->CollidesWith(a)) {
         m->HandleCollision();
+        a->HandleCollision();
       }
     }
   }
@@ -131,8 +140,9 @@ void SFApp::OnUpdateWorld() {
 void SFApp::OnRender() {
   SDL_RenderClear(sf_window->getRenderer());
 
-  // draw the player
-  player->OnRender();
+  // draw the player,
+  // who can now also die..
+  if(player->IsAlive()) {player->OnRender();}
 
   for(auto p: projectiles) {
     if(p->IsAlive()) {p->OnRender();}
@@ -142,12 +152,15 @@ void SFApp::OnRender() {
     if(a->IsAlive()) {a->OnRender();}
   }
 
+  // meteors can 'die'
   for(auto m: meteors) {
     if(m->IsAlive()) {m->OnRender();}
   }
 
+  // and so can collectable powerup,
+  // this is loosely used to disappear once picked up
   for(auto u: powerups) {
-    u->OnRender();
+    if(u->IsAlive()) {u->OnRender();}
   }
 
   // Switch the off-screen buffer to be on-screen

@@ -31,6 +31,7 @@ public:
 
   virtual void      SetPosition(Point2 &);
   virtual Point2    GetPosition();
+  // get/set acceleration added here
   virtual void      SetAcceleration(int);
   virtual int       GetAcceleration();
   virtual SFAssetId GetId();
@@ -55,6 +56,7 @@ private:
   SFASSETTYPE                 type;
   SFAssetId                   id;
   std::shared_ptr<SFWindow>   sf_window;
+  // added acceleration multiplier
   int                         acc;
 
   static int SFASSETID;
