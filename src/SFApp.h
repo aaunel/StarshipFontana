@@ -12,6 +12,8 @@ using namespace std;
 #include "SFEvent.h"
 #include "SFAsset.h"
 
+enum STATES {WORLD, MAIN_MENU, LOSE_MENU, WIN_MENU};
+
 /**
  * Represents the StarshipFontana application.  It has responsibilities for
  * * Creating and destroying the app window
@@ -28,10 +30,17 @@ public:
 
   void    FireProjectile();
 private:
+  int                     state;
   bool                    is_running;
+
+  // render different screens
+  void    RenderWorld();
+  void    RenderMainMenu();
 
   shared_ptr<SFWindow>       sf_window;
 
+  // added menu title pointer
+  shared_ptr<SFAsset>        title;
   shared_ptr<SFAsset>        player;
   // added wormhole pointer
   shared_ptr<SFAsset>        wormhole;

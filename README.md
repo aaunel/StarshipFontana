@@ -114,3 +114,5 @@ _You should note that there may be an error in my collision detection code. Ther
 
 - write ethics and learning outcome to accompany assignment
     - attempt at deltaTime movement physics
+    - attempt at image load
+    - attempt at audio load

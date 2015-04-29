@@ -1,6 +1,13 @@
 #include "SFApp.h"
 
 SFApp::SFApp(std::shared_ptr<SFWindow> window) : fire(0), is_running(true), sf_window(window) {
+  RenderMainMenu();
+}
+
+SFApp::~SFApp() {
+}
+
+void SFApp::RenderWorld() {
   int canvas_w, canvas_h;
   SDL_GetRendererOutputSize(sf_window->getRenderer(), &canvas_w, &canvas_h);
 
@@ -32,7 +39,7 @@ SFApp::SFApp(std::shared_ptr<SFWindow> window) : fire(0), is_running(true), sf_w
   alien_2->SetPosition(alien_2_pos);
   aliens.push_back(alien_2);
 
-  // our dangerous wall obstacles, mustn't fly into these,
+  // our dangerous wall obstacles; mustn't fly into these,
   // not the tidiest implementation of a level design,
   // could probably be improved using a basic grid matrix,
   // it would then be very tidy to place assets by editing a text file,
@@ -117,9 +124,30 @@ SFApp::SFApp(std::shared_ptr<SFWindow> window) : fire(0), is_running(true), sf_w
   auto pos  = Point2((col_w * 6) - col_w/2, 450.0f);
   powerup->SetPosition(pos);
   powerups.push_back(powerup);
+
+  // set world state
+  state = WORLD;
 }
 
-SFApp::~SFApp() {
+void SFApp::RenderMainMenu() {
+  int canvas_w, canvas_h;
+  SDL_GetRendererOutputSize(sf_window->getRenderer(), &canvas_w, &canvas_h);
+
+  app_box = make_shared<SFBoundingBox>(Vector2(canvas_w, canvas_h), canvas_w, canvas_h);
+  
+  // rendering menu title as in-game asset is terribly inefficient,
+  // and I did try my best to run this separately
+  title = make_shared<SFAsset>(SFASSET_POWERUP, sf_window);
+  auto title_pos = Point2(canvas_w/2, canvas_h/2);
+  title->SetPosition(title_pos);
+
+  player = make_shared<SFAsset>(SFASSET_PLAYER, sf_window);
+  auto player_pos = Point2(canvas_w/2, 100.0f);
+  player->SetAcceleration(32);
+  player->SetPosition(player_pos);
+
+  // set main menu state
+  state = MAIN_MENU;
 }
 
 /**
@@ -151,8 +179,12 @@ void SFApp::OnEvent(SFEvent& event) {
     player->GoEast();
     break;
   case SFEVENT_FIRE:
-    fire ++;
-    FireProjectile();
+    if (state == WORLD) {
+      fire ++;
+      FireProjectile();
+    } else {
+      RenderWorld();
+    }
     break;
   default:
     break;
@@ -199,6 +231,7 @@ void SFApp::OnUpdateWorld() {
   for(auto w : walls) {
     if(w->CollidesWith(player)) {
       player->HandleCollision();
+      RenderMainMenu();
     }
   }
 
@@ -211,6 +244,10 @@ void SFApp::OnUpdateWorld() {
       }
     }
   }
+
+  // garbage collection (?) here,
+  // not carried on with other assets,
+  // probably not a good thing!
 
   // remove dead aliens (the long way)
   list<shared_ptr<SFAsset>> tmp;
@@ -230,6 +267,10 @@ void SFApp::OnRender() {
   // who can now also die..
   if(player->IsAlive()) {player->OnRender();}
 
+  if(state != WORLD) {
+    // render menu title
+    title->OnRender();
+  } else {
   // wormhole
   wormhole->OnRender();
 
@@ -256,15 +297,18 @@ void SFApp::OnRender() {
   for(auto u: powerups) {
     if(u->IsAlive()) {u->OnRender();}
   }
+  }
 
   // Switch the off-screen buffer to be on-screen
   SDL_RenderPresent(sf_window->getRenderer());
 }
 
 void SFApp::FireProjectile() {
-  auto pb = make_shared<SFAsset>(SFASSET_PROJECTILE, sf_window);
-  auto v  = player->GetPosition();
-  pb->SetAcceleration(8);
-  pb->SetPosition(v);
-  projectiles.push_back(pb);
+  if(player->IsAlive()) {
+    auto pb = make_shared<SFAsset>(SFASSET_PROJECTILE, sf_window);
+    auto v  = player->GetPosition();
+    pb->SetAcceleration(8);
+    pb->SetPosition(v);
+    projectiles.push_back(pb);
+  }
 }
