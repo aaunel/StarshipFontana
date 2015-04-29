@@ -33,6 +33,8 @@ private:
   shared_ptr<SFWindow>       sf_window;
 
   shared_ptr<SFAsset>        player;
+  // added wormhole pointer
+  shared_ptr<SFAsset>        wormhole;
   shared_ptr<SFBoundingBox>  app_box;
   list<shared_ptr<SFAsset> > projectiles;
   list<shared_ptr<SFAsset> > aliens;

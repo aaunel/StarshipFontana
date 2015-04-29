@@ -16,6 +16,11 @@ SFApp::SFApp(std::shared_ptr<SFWindow> window) : fire(0), is_running(true), sf_w
   const int number_of_columns = 12;
   const int col_w = canvas_w / number_of_columns;
 
+  // wormhole, end-game objective
+  wormhole = make_shared<SFAsset>(SFASSET_WORMHOLE, sf_window);
+  auto wormhole_pos = Point2((col_w * 3) - col_w/2, 325.0f);
+  wormhole->SetPosition(wormhole_pos);
+
   // modified aliens, only two in the base,
   // these now sit within the column layout
   auto alien_1 = make_shared<SFAsset>(SFASSET_ALIEN, sf_window);
@@ -224,6 +229,9 @@ void SFApp::OnRender() {
   // draw the player,
   // who can now also die..
   if(player->IsAlive()) {player->OnRender();}
+
+  // wormhole
+  wormhole->OnRender();
 
   for(auto p: projectiles) {
     if(p->IsAlive()) {p->OnRender();}

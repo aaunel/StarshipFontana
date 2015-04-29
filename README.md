@@ -96,7 +96,7 @@ _You should note that there may be an error in my collision detection code. Ther
 - implement end-of-level goal asset
 - place end-of-level sprite in map
 - detect player collision with end-of-level goal
-- implement game win condition screen (with score)
+- implement game win condition screen
 - implement game lose condition screen
 
 ### Fifth Phase

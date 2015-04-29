@@ -12,6 +12,9 @@ SFAsset::SFAsset(SFASSETTYPE type, std::shared_ptr<SFWindow> window): type(type)
   case SFASSET_PROJECTILE:
     sprite = IMG_LoadTexture(sf_window->getRenderer(), "assets/projectile.png");
     break;
+  case SFASSET_WORMHOLE:
+    sprite = IMG_LoadTexture(sf_window->getRenderer(), "assets/wormhole.png");
+    break;
   case SFASSET_ALIEN:
     sprite = IMG_LoadTexture(sf_window->getRenderer(), "assets/alien.png");
     break;
