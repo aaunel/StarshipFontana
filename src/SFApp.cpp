@@ -26,11 +26,11 @@ SFApp::SFApp(std::shared_ptr<SFWindow> window) : fire(0), is_running(true), sf_w
   meteor->SetPosition(meteor_pos);
   meteors.push_back(meteor);
 
-  auto coin = make_shared<SFAsset>(SFASSET_COIN, sf_window);
+  auto powerup = make_shared<SFAsset>(SFASSET_POWERUP, sf_window);
   auto pos  = Point2((canvas_w/4), 100);
-  coin->SetAcceleration(1);
-  coin->SetPosition(pos);
-  coins.push_back(coin);
+  powerup->SetAcceleration(1);
+  powerup->SetPosition(pos);
+  powerups.push_back(powerup);
 }
 
 SFApp::~SFApp() {
@@ -92,7 +92,7 @@ void SFApp::OnUpdateWorld() {
     m->GoSouth();
   }
 
-  for(auto c: coins) {
+  for(auto c: powerups) {
     c->GoNorth();
   }
 
@@ -146,8 +146,8 @@ void SFApp::OnRender() {
     if(m->IsAlive()) {m->OnRender();}
   }
 
-  for(auto c: coins) {
-    c->OnRender();
+  for(auto u: powerups) {
+    u->OnRender();
   }
 
   // Switch the off-screen buffer to be on-screen

@@ -18,7 +18,7 @@ SFAsset::SFAsset(SFASSETTYPE type, std::shared_ptr<SFWindow> window): type(type)
   case SFASSET_METEOR:
     sprite = IMG_LoadTexture(sf_window->getRenderer(), "assets/meteor.png");
     break;
-  case SFASSET_COIN:
+  case SFASSET_POWERUP:
     sprite = IMG_LoadTexture(sf_window->getRenderer(), "assets/powerup.png");
     break;
   default:
