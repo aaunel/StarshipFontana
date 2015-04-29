@@ -18,6 +18,9 @@ SFAsset::SFAsset(SFASSETTYPE type, std::shared_ptr<SFWindow> window): type(type)
   // here I'm loading in some new assets,
   // doesn't make for the most interesting code
   // but snags all the eye-catching glory
+  case SFASSET_WALL:
+    sprite = IMG_LoadTexture(sf_window->getRenderer(), "assets/wall.png");
+    break;
   case SFASSET_METEOR:
     sprite = IMG_LoadTexture(sf_window->getRenderer(), "assets/meteor.png");
     break;

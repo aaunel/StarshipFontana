@@ -10,15 +10,94 @@ SFApp::SFApp(std::shared_ptr<SFWindow> window) : fire(0), is_running(true), sf_w
   player->SetAcceleration(16);
   player->SetPosition(player_pos);
 
-  const int number_of_aliens = 10;
-  for(int i=0; i<number_of_aliens; i++) {
-    // place an alien at width/number_of_aliens * i
-    auto alien = make_shared<SFAsset>(SFASSET_ALIEN, sf_window);
-    auto pos   = Point2((canvas_w/number_of_aliens) * i, 200.0f);
-    alien->SetAcceleration(5);
-    alien->SetPosition(pos);
-    aliens.push_back(alien);
+  // columns, stolen from web concept,
+  // seemed a slightly tidier way to achieve a layout
+  // here I'm dividing up the canvas into columns
+  const int number_of_columns = 12;
+  const int col_w = canvas_w / number_of_columns;
+
+  // modified aliens, only two in the base,
+  // these now sit within the column layout
+  auto alien_1 = make_shared<SFAsset>(SFASSET_ALIEN, sf_window);
+  auto alien_1_pos = Point2((col_w * 9) - col_w/2, 300.0f);
+  alien_1->SetPosition(alien_1_pos);
+  aliens.push_back(alien_1);
+  auto alien_2 = make_shared<SFAsset>(SFASSET_ALIEN, sf_window);
+  auto alien_2_pos = Point2((col_w * 3) - col_w/2, 250.0f);
+  alien_2->SetPosition(alien_2_pos);
+  aliens.push_back(alien_2);
+
+  // our dangerous wall obstacles, mustn't fly into these,
+  // not the tidiest implementation of a level design,
+  // could probably be improved using a basic grid matrix,
+  // it would then be very tidy to place assets by editing a text file,
+  // e.g. { a: alien, w: wall, p: player }
+  //    00a00a00
+  //    ww0ww0ww
+  //    0000p000
+
+  // Row 1
+  for(int i=1; i<number_of_columns-1; i++) {
+    auto wall = make_shared<SFAsset>(SFASSET_WALL, sf_window);
+    auto pos = Point2(col_w * i, 400.0f);
+    wall->SetPosition(pos);
+    walls.push_back(wall);
   }
+  // Row 2
+  for(int i=1; i<number_of_columns-1; i++) {
+    if(i == 1 || i == 4 || i == 10) {
+      auto wall = make_shared<SFAsset>(SFASSET_WALL, sf_window);
+      auto pos = Point2(col_w * i, 350.0f);
+      wall->SetPosition(pos);
+      walls.push_back(wall);
+    }
+  }
+  // Row 3
+  for(int i=1; i<number_of_columns-1; i++) {
+    if(i == 1 || i == 4 || i == 10) {
+      auto wall = make_shared<SFAsset>(SFASSET_WALL, sf_window);
+      auto pos = Point2(col_w * i, 300.0f);
+      wall->SetPosition(pos);
+      walls.push_back(wall);
+    }
+  }
+  // Row 4
+  for(int i=1; i<number_of_columns-1; i++) {
+    if(i == 1 || i == 4 || i == 7 || i == 10) {
+      auto wall = make_shared<SFAsset>(SFASSET_WALL, sf_window);
+      auto pos = Point2(col_w * i, 250.0f);
+      wall->SetPosition(pos);
+      walls.push_back(wall);
+    }
+  }
+  // Row 5
+  for(int i=1; i<number_of_columns-1; i++) {
+    if(i == 1 || i == 7 || i == 10) {
+      auto wall = make_shared<SFAsset>(SFASSET_WALL, sf_window);
+      auto pos = Point2(col_w * i, 200.0f);
+      wall->SetPosition(pos);
+      walls.push_back(wall);
+    }
+  }
+  // Row 6
+  for(int i=1; i<number_of_columns-1; i++) {
+    if(i == 1 || i == 7 || i == 10) {
+      auto wall = make_shared<SFAsset>(SFASSET_WALL, sf_window);
+      auto pos = Point2(col_w * i, 150.0f);
+      wall->SetPosition(pos);
+      walls.push_back(wall);
+    }
+  }
+  // Row 7
+  for(int i=1; i<number_of_columns-1; i++) {
+    if(i < 8 || i == 10) {
+      auto wall = make_shared<SFAsset>(SFASSET_WALL, sf_window);
+      auto pos = Point2(col_w * i, 100.0f);
+      wall->SetPosition(pos);
+      walls.push_back(wall);
+    }
+  }
+
 
   // the meteor adds an additional sprite
   // managed using std::list, which could allow for multiple meteors
@@ -30,8 +109,7 @@ SFApp::SFApp(std::shared_ptr<SFWindow> window) : fire(0), is_running(true), sf_w
 
   // the powerup is similar to a coin, but hey - it's a power up
   auto powerup = make_shared<SFAsset>(SFASSET_POWERUP, sf_window);
-  auto pos  = Point2((canvas_w/4), 100);
-  powerup->SetAcceleration(1);
+  auto pos  = Point2((col_w * 6) - col_w/2, 450.0f);
   powerup->SetPosition(pos);
   powerups.push_back(powerup);
 }
@@ -97,10 +175,6 @@ void SFApp::OnUpdateWorld() {
     m->GoNorth();
   }
 
-  for(auto u: powerups) {
-    u->GoNorth();
-  }
-
   // Update enemy positions
   for(auto a : aliens) {
     // do something here
@@ -150,6 +224,11 @@ void SFApp::OnRender() {
 
   for(auto a: aliens) {
     if(a->IsAlive()) {a->OnRender();}
+  }
+
+  // the walls
+  for(auto w: walls) {
+    w->OnRender();
   }
 
   // meteors can 'die'
