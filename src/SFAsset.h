@@ -31,6 +31,8 @@ public:
 
   virtual void      SetPosition(Point2 &);
   virtual Point2    GetPosition();
+  virtual void      SetAcceleration(int);
+  virtual int       GetAcceleration();
   virtual SFAssetId GetId();
   virtual void      OnRender();
   virtual void      GoEast();
@@ -53,6 +55,7 @@ private:
   SFASSETTYPE                 type;
   SFAssetId                   id;
   std::shared_ptr<SFWindow>   sf_window;
+  int                         acc;
 
   static int SFASSETID;
 };

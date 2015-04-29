@@ -7,6 +7,7 @@ SFApp::SFApp(std::shared_ptr<SFWindow> window) : fire(0), is_running(true), sf_w
   app_box = make_shared<SFBoundingBox>(Vector2(canvas_w, canvas_h), canvas_w, canvas_h);
   player  = make_shared<SFAsset>(SFASSET_PLAYER, sf_window);
   auto player_pos = Point2(canvas_w/2, 22);
+  player->SetAcceleration(16);
   player->SetPosition(player_pos);
 
   const int number_of_aliens = 10;
@@ -14,17 +15,20 @@ SFApp::SFApp(std::shared_ptr<SFWindow> window) : fire(0), is_running(true), sf_w
     // place an alien at width/number_of_aliens * i
     auto alien = make_shared<SFAsset>(SFASSET_ALIEN, sf_window);
     auto pos   = Point2((canvas_w/number_of_aliens) * i, 200.0f);
+    alien->SetAcceleration(5);
     alien->SetPosition(pos);
     aliens.push_back(alien);
   }
 
   auto meteor = make_shared<SFAsset>(SFASSET_METEOR, sf_window);
   auto meteor_pos = Point2(canvas_w - 100, 300.0f);
+  meteor->SetAcceleration(1);
   meteor->SetPosition(meteor_pos);
   meteors.push_back(meteor);
 
   auto coin = make_shared<SFAsset>(SFASSET_COIN, sf_window);
   auto pos  = Point2((canvas_w/4), 100);
+  coin->SetAcceleration(1);
   coin->SetPosition(pos);
   coins.push_back(coin);
 }
@@ -45,6 +49,12 @@ void SFApp::OnEvent(SFEvent& event) {
   case SFEVENT_UPDATE:
     OnUpdateWorld();
     OnRender();
+    break;
+  case SFEVENT_PLAYER_UP:
+    player->GoNorth();
+    break;
+  case SFEVENT_PLAYER_DOWN:
+    player->GoSouth();
     break;
   case SFEVENT_PLAYER_LEFT:
     player->GoWest();
@@ -147,6 +157,7 @@ void SFApp::OnRender() {
 void SFApp::FireProjectile() {
   auto pb = make_shared<SFAsset>(SFASSET_PROJECTILE, sf_window);
   auto v  = player->GetPosition();
+  pb->SetAcceleration(8);
   pb->SetPosition(v);
   projectiles.push_back(pb);
 }
