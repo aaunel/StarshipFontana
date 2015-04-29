@@ -190,6 +190,13 @@ void SFApp::OnUpdateWorld() {
     }
   }
 
+  // Detect wall collisions
+  for(auto w : walls) {
+    if(w->CollidesWith(player)) {
+      player->HandleCollision();
+    }
+  }
+
   // Detect meteor collisions
   for(auto m : meteors) {
     for(auto a : aliens) {
