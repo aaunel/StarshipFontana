@@ -140,7 +140,7 @@ void SFApp::RenderWorld() {
 void SFApp::RenderMenu() {
   // defenses start up
   defenses = true;
-  
+
   int canvas_w, canvas_h;
   SDL_GetRendererOutputSize(sf_window->getRenderer(), &canvas_w, &canvas_h);
 
@@ -246,13 +246,28 @@ void SFApp::OnUpdateWorld() {
 
   // Update enemy positions
   for(auto a : aliens) {
-    // do something here
+    if(a->CollidesWith(player)) {
+      player->HandleCollision();
+      SetState(LOSE_MENU);
+      RenderMenu();
+    }
   }
 
   // Detect projectile collisions
   for(auto p : projectiles) {
+    if(gate->IsAlive() && p->CollidesWith(gate)) {
+      p->HandleCollision();
+    }
+    for(auto w : walls) {
+      if(p->CollidesWith(w)) {
+        p->HandleCollision();
+      }
+    }
     for(auto a : aliens) {
-      if(p->CollidesWith(a)) {
+      // looks like I'm not alone in
+      // taking shortcuts! haha ..
+      // dead projectiles can collide
+      if(p->IsAlive() && p->CollidesWith(a)) {
         p->HandleCollision();
         a->HandleCollision();
       }
