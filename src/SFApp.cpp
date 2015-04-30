@@ -1,9 +1,8 @@
 #include "SFApp.h"
 
 SFApp::SFApp(std::shared_ptr<SFWindow> window) : fire(0), is_running(true), sf_window(window) {
-  // set main menu state
-  SetState(MAIN_MENU);
-  RenderMenu();
+  // render main menu state
+  RenderMenu(MAIN_MENU);
 }
 
 SFApp::~SFApp() {
@@ -137,7 +136,10 @@ void SFApp::RenderWorld() {
   SetState(WORLD);
 }
 
-void SFApp::RenderMenu() {
+void SFApp::RenderMenu(int menu_state) {
+  // set menu state
+  SetState(menu_state);
+
   // defenses start up
   defenses = true;
 
@@ -248,8 +250,7 @@ void SFApp::OnUpdateWorld() {
   for(auto a : aliens) {
     if(a->CollidesWith(player)) {
       player->HandleCollision();
-      SetState(LOSE_MENU);
-      RenderMenu();
+      RenderMenu(LOSE_MENU);
     }
   }
 
@@ -276,8 +277,7 @@ void SFApp::OnUpdateWorld() {
 
   // Detect objective collision
   if(wormhole->CollidesWith(player)) {
-    SetState(WIN_MENU);
-    RenderMenu();
+    RenderMenu(WIN_MENU);
   }
 
   // Detect gate collision,
@@ -287,16 +287,14 @@ void SFApp::OnUpdateWorld() {
   // collision when gate is still 'alive'
   if(gate->IsAlive() && gate->CollidesWith(player)) {
     player->HandleCollision();
-    SetState(LOSE_MENU);
-    RenderMenu();
+    RenderMenu(LOSE_MENU);
   }
 
   // Detect wall collisions
   for(auto w : walls) {
     if(w->CollidesWith(player)) {
       player->HandleCollision();
-      SetState(LOSE_MENU);
-      RenderMenu();
+      RenderMenu(LOSE_MENU);
     }
   }
 

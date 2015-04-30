@@ -42,7 +42,7 @@ private:
   int     GetState();
   // render different screens
   void    RenderWorld();
-  void    RenderMenu();
+  void    RenderMenu(int STATES);
 
   shared_ptr<SFWindow>       sf_window;
 
