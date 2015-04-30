@@ -1,7 +1,9 @@
 #include "SFApp.h"
 
 SFApp::SFApp(std::shared_ptr<SFWindow> window) : fire(0), is_running(true), sf_window(window) {
-  RenderMainMenu();
+  // set main menu state
+  SetState(MAIN_MENU);
+  RenderMenu();
 }
 
 SFApp::~SFApp() {
@@ -126,10 +128,10 @@ void SFApp::RenderWorld() {
   powerups.push_back(powerup);
 
   // set world state
-  state = WORLD;
+  SetState(WORLD);
 }
 
-void SFApp::RenderMainMenu() {
+void SFApp::RenderMenu() {
   int canvas_w, canvas_h;
   SDL_GetRendererOutputSize(sf_window->getRenderer(), &canvas_w, &canvas_h);
 
@@ -137,17 +139,29 @@ void SFApp::RenderMainMenu() {
   
   // rendering menu title as in-game asset is terribly inefficient,
   // and I did try my best to run this separately
-  title = make_shared<SFAsset>(SFASSET_POWERUP, sf_window);
-  auto title_pos = Point2(canvas_w/2, canvas_h/2);
+  if(GetState() != LOSE_MENU) {
+    title = make_shared<SFAsset>(SFASSET_TITLE, sf_window);
+  } else {
+    title = make_shared<SFAsset>(SFASSET_RETRY, sf_window);
+  }
+  auto title_pos = Point2(canvas_w/2, (canvas_h/3)*2);
   title->SetPosition(title_pos);
 
-  player = make_shared<SFAsset>(SFASSET_PLAYER, sf_window);
-  auto player_pos = Point2(canvas_w/2, 100.0f);
-  player->SetAcceleration(32);
-  player->SetPosition(player_pos);
-
-  // set main menu state
-  state = MAIN_MENU;
+  // render playable character in main menu
+  if(GetState() == MAIN_MENU) {
+    player = make_shared<SFAsset>(SFASSET_PLAYER, sf_window);
+    auto player_pos = Point2(canvas_w/2, 100.0f);
+    player->SetAcceleration(32);
+    player->SetPosition(player_pos);
+  } else if (GetState() == LOSE_MENU) {
+    status = make_shared<SFAsset>(SFASSET_LOSE, sf_window);
+    auto status_pos = Point2(canvas_w/2, 100.0f);
+    status->SetPosition(status_pos);
+  } else if (GetState() == WIN_MENU) {
+    status = make_shared<SFAsset>(SFASSET_WIN, sf_window);
+    auto status_pos = Point2(canvas_w/2, 100.0f);
+    status->SetPosition(status_pos);
+  }
 }
 
 /**
@@ -179,7 +193,7 @@ void SFApp::OnEvent(SFEvent& event) {
     player->GoEast();
     break;
   case SFEVENT_FIRE:
-    if (state == WORLD) {
+    if (GetState() == WORLD) {
       fire ++;
       FireProjectile();
     } else {
@@ -231,7 +245,8 @@ void SFApp::OnUpdateWorld() {
   for(auto w : walls) {
     if(w->CollidesWith(player)) {
       player->HandleCollision();
-      RenderMainMenu();
+      SetState(LOSE_MENU);
+      RenderMenu();
     }
   }
 
@@ -263,13 +278,20 @@ void SFApp::OnUpdateWorld() {
 void SFApp::OnRender() {
   SDL_RenderClear(sf_window->getRenderer());
 
-  // draw the player,
-  // who can now also die..
-  if(player->IsAlive()) {player->OnRender();}
+  if(GetState() == WORLD || GetState() == MAIN_MENU) {
+    // draw the player,
+    // who can now also die..
+    if(player->IsAlive()) {player->OnRender();}
+  }
 
-  if(state != WORLD) {
+  if(GetState() != WORLD) {
     // render menu title
     title->OnRender();
+
+    if(GetState() == LOSE_MENU || GetState() == WIN_MENU) {
+      // render menu status
+      status->OnRender();
+    }
   } else {
   // wormhole
   wormhole->OnRender();
@@ -301,6 +323,15 @@ void SFApp::OnRender() {
 
   // Switch the off-screen buffer to be on-screen
   SDL_RenderPresent(sf_window->getRenderer());
+}
+
+// state set/get
+void SFApp::SetState(int val) {
+  state = val;
+}
+
+int SFApp::GetState() {
+  return state;
 }
 
 void SFApp::FireProjectile() {

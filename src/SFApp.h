@@ -33,14 +33,18 @@ private:
   int                     state;
   bool                    is_running;
 
+  // manage game states
+  void    SetState(int STATES);
+  int     GetState();
   // render different screens
   void    RenderWorld();
-  void    RenderMainMenu();
+  void    RenderMenu();
 
   shared_ptr<SFWindow>       sf_window;
 
-  // added menu title pointer
+  // added menu title and status pointers
   shared_ptr<SFAsset>        title;
+  shared_ptr<SFAsset>        status;
   shared_ptr<SFAsset>        player;
   // added wormhole pointer
   shared_ptr<SFAsset>        wormhole;

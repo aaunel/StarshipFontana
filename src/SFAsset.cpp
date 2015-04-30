@@ -6,6 +6,18 @@ SFAsset::SFAsset(SFASSETTYPE type, std::shared_ptr<SFWindow> window): type(type)
   this->id   = ++SFASSETID;
 
   switch (type) {
+  case SFASSET_TITLE:
+    sprite = IMG_LoadTexture(sf_window->getRenderer(), "assets/title.png");
+    break;
+  case SFASSET_RETRY:
+    sprite = IMG_LoadTexture(sf_window->getRenderer(), "assets/retry.png");
+    break;
+  case SFASSET_WIN:
+    sprite = IMG_LoadTexture(sf_window->getRenderer(), "assets/win.png");
+    break;
+  case SFASSET_LOSE:
+    sprite = IMG_LoadTexture(sf_window->getRenderer(), "assets/lose.png");
+    break;
   case SFASSET_PLAYER:
     sprite = IMG_LoadTexture(sf_window->getRenderer(), "assets/player.png");
     break;

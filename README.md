@@ -33,6 +33,8 @@ from the top-level directory.  The game will expect to find the
 ## Credits ##
 Updated sprites credited to the [KenneyDonation Game Assets](http://kenney.itch.io/kenney-donation) and are used under the terms of the [CC0](http://creativecommons.org/publicdomain/zero/1.0/ "Creative Commons Zero") license.
 
+"Vox Round" font used in titles licensed from TypeKit through Adobe Creative Cloud, used under [TypeKit Services Agreement](http://www.adobe.com/products/eulas/tou_typekit/ "Terms of Use").
+
 [StarshipFontana]: https://github.com/AidanDelaney/StarshipFontana
 
 ---

@@ -21,7 +21,14 @@ using namespace std;
  * enum to mark the type of the SFAsset.  If we add more asset types then
  * the subclassing strategy becomes a better option.
  */
-enum SFASSETTYPE {SFASSET_DEAD, SFASSET_PLAYER, SFASSET_PROJECTILE, SFASSET_ALIEN, SFASSET_WALL, SFASSET_WORMHOLE, SFASSET_METEOR, SFASSET_POWERUP};
+enum SFASSETTYPE {
+  // menu assets
+  SFASSET_TITLE, SFASSET_RETRY, SFASSET_WIN, SFASSET_LOSE,
+  // static map assets
+  SFASSET_DEAD, SFASSET_WALL,
+  // interactive game assets
+  SFASSET_PLAYER, SFASSET_PROJECTILE, SFASSET_ALIEN, SFASSET_WORMHOLE, SFASSET_METEOR, SFASSET_POWERUP
+};
 
 class SFAsset {
 public:
