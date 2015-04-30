@@ -175,7 +175,9 @@ void SFApp::OnEvent(SFEvent& event) {
     is_running = false;
     break;
   case SFEVENT_UPDATE:
-    OnUpdateWorld();
+    // only updating world in appropriate state now,
+    // failing to do this actually crashes the game
+    if(GetState() == WORLD) {OnUpdateWorld();}
     OnRender();
     break;
   // adds player up movement
@@ -239,6 +241,12 @@ void SFApp::OnUpdateWorld() {
         a->HandleCollision();
       }
     }
+  }
+
+  // Detect objective collision
+  if(wormhole->CollidesWith(player)) {
+    SetState(WIN_MENU);
+    RenderMenu();
   }
 
   // Detect wall collisions
