@@ -58,7 +58,7 @@ Follow the Captain on a final journey, taking a brute force or careful preparati
 - Wormhole end-game condition, main story objective
 - Hostile alien guards obstructing the wormhole
 - Game win-lose conditions and screens
-- Collectable item, optional objective
+- Collectible item, optional (?) objective
 
 #### Stretch Goals
 
@@ -103,9 +103,9 @@ _You should note that there may be an error in my collision detection code. Ther
 
 ### Fifth Phase
 
-- implement collectable asset
-- place collectable sprite in map
-- integrate collectable detection and score in game
+- implement collectible asset
+- place collectible sprite in map
+- integrate collectible detection and score in game
 - implement game start / reset screen
 - implement game audio
 - add start screen audio

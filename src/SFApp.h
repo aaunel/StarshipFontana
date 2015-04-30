@@ -33,6 +33,10 @@ private:
   int                     state;
   bool                    is_running;
 
+  // collectible objective
+  bool    defenses;
+  void    DownDefenses();
+
   // manage game states
   void    SetState(int STATES);
   int     GetState();
@@ -46,8 +50,9 @@ private:
   shared_ptr<SFAsset>        title;
   shared_ptr<SFAsset>        status;
   shared_ptr<SFAsset>        player;
-  // added wormhole pointer
+  // added wormhole and gate pointers
   shared_ptr<SFAsset>        wormhole;
+  shared_ptr<SFAsset>        gate;
   shared_ptr<SFBoundingBox>  app_box;
   list<shared_ptr<SFAsset> > projectiles;
   list<shared_ptr<SFAsset> > aliens;

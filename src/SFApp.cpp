@@ -112,12 +112,18 @@ void SFApp::RenderWorld() {
     }
   }
 
+  // the meteor destroys this once the collectible objective
+  // is retrieved by the player
+  gate = make_shared<SFAsset>(SFASSET_GATE, sf_window);
+  auto gate_pos = Point2((col_w * 9) - col_w/2, 100.0f);
+  gate->SetPosition(gate_pos);
 
   // the meteor adds an additional sprite
   // managed using std::list, which could allow for multiple meteors
   auto meteor = make_shared<SFAsset>(SFASSET_METEOR, sf_window);
-  auto meteor_pos = Point2(canvas_w - 100, 100.0f);
-  meteor->SetAcceleration(1);
+  // positioned off-screen to begin with
+  auto meteor_pos = Point2((col_w * 9) - col_w/2, -100.0f);
+  meteor->SetAcceleration(2);
   meteor->SetPosition(meteor_pos);
   meteors.push_back(meteor);
 
@@ -132,6 +138,9 @@ void SFApp::RenderWorld() {
 }
 
 void SFApp::RenderMenu() {
+  // defenses start up
+  defenses = true;
+  
   int canvas_w, canvas_h;
   SDL_GetRendererOutputSize(sf_window->getRenderer(), &canvas_w, &canvas_h);
 
@@ -162,6 +171,10 @@ void SFApp::RenderMenu() {
     auto status_pos = Point2(canvas_w/2, 100.0f);
     status->SetPosition(status_pos);
   }
+}
+
+void SFApp::DownDefenses() {
+  defenses = false;
 }
 
 /**
@@ -224,8 +237,11 @@ void SFApp::OnUpdateWorld() {
     p->GoNorth();
   }
 
-  for(auto m: meteors) {
-    m->GoNorth();
+  if(defenses == false) {
+    // set meteor to take out defenses
+    for(auto m: meteors) {
+      m->GoNorth();
+    }
   }
 
   // Update enemy positions
@@ -249,6 +265,17 @@ void SFApp::OnUpdateWorld() {
     RenderMenu();
   }
 
+  // Detect gate collision,
+  // like wall collision,
+  // the gate can be rendered as 'empty' but
+  // the bounding box remains, so only detect
+  // collision when gate is still 'alive'
+  if(gate->IsAlive() && gate->CollidesWith(player)) {
+    player->HandleCollision();
+    SetState(LOSE_MENU);
+    RenderMenu();
+  }
+
   // Detect wall collisions
   for(auto w : walls) {
     if(w->CollidesWith(player)) {
@@ -260,11 +287,23 @@ void SFApp::OnUpdateWorld() {
 
   // Detect meteor collisions
   for(auto m : meteors) {
-    for(auto a : aliens) {
-      if(m->CollidesWith(a)) {
+    if(m->CollidesWith(gate)) {
+      m->HandleCollision();
+      gate->HandleCollision();
+    }
+    for(auto w : walls) {
+      if(m->CollidesWith(w)) {
         m->HandleCollision();
-        a->HandleCollision();
+        w->HandleCollision();
       }
+    }
+  }
+
+  // Detect collectible objective
+  for(auto p : powerups) {
+    if(p->CollidesWith(player)) {
+      p->HandleCollision();
+      DownDefenses();
     }
   }
 
@@ -317,12 +356,15 @@ void SFApp::OnRender() {
     w->OnRender();
   }
 
+  // destructible gate to the alien base
+  if(gate->IsAlive()) {gate->OnRender();}
+
   // meteors can 'die'
   for(auto m: meteors) {
     if(m->IsAlive()) {m->OnRender();}
   }
 
-  // and so can collectable powerup,
+  // and so can collectible powerup,
   // this is loosely used to disappear once picked up
   for(auto u: powerups) {
     if(u->IsAlive()) {u->OnRender();}
