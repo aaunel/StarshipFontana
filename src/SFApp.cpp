@@ -184,6 +184,27 @@ void SFApp::DownDefenses() {
  * These are timer or keyboard events.
  */
 void SFApp::OnEvent(SFEvent& event) {
+  bool collides = false;
+
+  if(GetState() == WORLD) {
+    // Detect gate collision,
+    // like wall collision,
+    // the gate can be rendered as 'empty' but
+    // the bounding box remains, so only detect
+    // collision when gate is still 'alive'
+    if(gate->IsAlive() && gate->CollidesWith(player)) {
+      collides = true;
+    }
+
+    // Detect wall collisions,
+    // player can't move through walls
+    for(auto w : walls) {
+      if(w->CollidesWith(player)) {
+        collides = true;
+      }
+    }
+  }
+
   SFEVENT the_event = event.GetCode();
   switch (the_event) {
   case SFEVENT_QUIT:
@@ -197,17 +218,37 @@ void SFApp::OnEvent(SFEvent& event) {
     break;
   // adds player up movement
   case SFEVENT_PLAYER_UP:
-    player->GoNorth();
+    if(collides) {
+      // avoid collision
+      player->GoSouth();
+    } else {
+      player->GoNorth();
+    }
     break;
   // adds player down movement
   case SFEVENT_PLAYER_DOWN:
-    player->GoSouth();
+    if(collides) {
+      // avoid collision
+      player->GoNorth();
+    } else {
+      player->GoSouth();
+    }
     break;
   case SFEVENT_PLAYER_LEFT:
-    player->GoWest();
+    if(collides) {
+      // avoid collision
+      player->GoEast();
+    } else {
+      player->GoWest();
+    }
     break;
   case SFEVENT_PLAYER_RIGHT:
-    player->GoEast();
+    if(collides) {
+      // avoid collision
+      player->GoWest();
+    } else {
+      player->GoEast();
+    }
     break;
   case SFEVENT_FIRE:
     if (GetState() == WORLD) {
@@ -278,24 +319,6 @@ void SFApp::OnUpdateWorld() {
   // Detect objective collision
   if(wormhole->CollidesWith(player)) {
     RenderMenu(WIN_MENU);
-  }
-
-  // Detect gate collision,
-  // like wall collision,
-  // the gate can be rendered as 'empty' but
-  // the bounding box remains, so only detect
-  // collision when gate is still 'alive'
-  if(gate->IsAlive() && gate->CollidesWith(player)) {
-    player->HandleCollision();
-    RenderMenu(LOSE_MENU);
-  }
-
-  // Detect wall collisions
-  for(auto w : walls) {
-    if(w->CollidesWith(player)) {
-      player->HandleCollision();
-      RenderMenu(LOSE_MENU);
-    }
   }
 
   // Detect meteor collisions
